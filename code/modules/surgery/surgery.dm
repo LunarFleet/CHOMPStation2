@@ -156,6 +156,7 @@
 					to_chat(user, "<span class='danger'>You focus on attempting to perform surgery upon yourself.</span>")	//CHOMPEdit
 					if(!do_after(user, 6 SECONDS, M) || !prob(70)) // CH edit
 						to_chat(user, "<span class='danger'>You fail to focus on your task, causing your hand to slip!</span>") // CH edit
+						M.apply_damage(round(rand(5,10),BRUTE,zone,sharp = TRUE)
 						success = FALSE
 				//CHOMPEdit End
 				// Bad tools make it less likely to succeed.
