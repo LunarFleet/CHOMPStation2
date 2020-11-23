@@ -121,14 +121,14 @@
 
 
 /obj/item/proc/can_do_surgery(mob/living/carbon/M, mob/living/user)
-	if(M == user)
-		return 0
+//	if(M == user)
+//		return 0
 	if(!ishuman(M))
 		return 1
 
 	return 1
 
-/obj/item/proc/do_surgery(mob/living/carbon/M, mob/living/user)
+/obj/item/proc/do_surgery(mob/living/carbon/M, mob/living/user, target_zone)
 	if(!can_do_surgery(M, user))
 		return 0
 	if(!istype(M))
@@ -139,11 +139,22 @@
 	if(zone in M.op_stage.in_progress) //Can't operate on someone repeatedly.
 		to_chat(user, "<span class='warning'>You can't operate on this area while surgery is already in progress.</span>")
 		return 1
+
 	for(var/datum/surgery_step/S in surgery_steps)
 		//check if tool is right or close enough and if this step is possible
 		if(S.tool_quality(src))
 			var/step_is_valid = S.can_use(user, M, zone, src)
 			if(step_is_valid && S.is_valid_target(M))
+
+				if(M == user)	// Once we determine if we can actually do a step at all, give a slight delay to self-surgery to confirm attempts.
+					to_chat(user, "<span class='critical'>You focus on attempting to perform surgery upon yourself.</span>")
+
+					if(!do_after(user, 6 SECONDS, M) || !prob(70)) // CH edit
+						to_chat(user, "<span class='critical'>You fail to focus on your task, causing your hand to slip!</span>") // CH edit
+						var/obj/item/organ/external/affected = user.get_organ(target_zone) // CH edit
+						affected.createwound(CUT, rand(10,20)) // CH edit
+						return 0
+
 				if(step_is_valid == SURGERY_FAILURE) // This is a failure that already has a message for failing.
 					return 1
 				M.op_stage.in_progress += zone
@@ -155,7 +166,7 @@
 					success = FALSE
 
 				// Bad or no surface may mean failure as well.
-				var/obj/surface = M.get_surgery_surface()
+				var/obj/surface = M.get_surgery_surface(user)
 				if(!surface || !prob(surface.surgery_odds))
 					success = FALSE
 
