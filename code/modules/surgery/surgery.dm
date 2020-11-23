@@ -145,22 +145,19 @@
 		if(S.tool_quality(src))
 			var/step_is_valid = S.can_use(user, M, zone, src)
 			if(step_is_valid && S.is_valid_target(M))
-
-				if(M == user)	// Once we determine if we can actually do a step at all, give a slight delay to self-surgery to confirm attempts.
-					to_chat(user, "<span class='critical'>You focus on attempting to perform surgery upon yourself.</span>")
-
-					if(!do_after(user, 6 SECONDS, M) || !prob(70)) // CH edit
-						to_chat(user, "<span class='critical'>You fail to focus on your task, causing your hand to slip!</span>") // CH edit
-						var/obj/item/organ/external/affected = user.get_organ(zone) // CH edit
-						affected.createwound(CUT, rand(10,20)) // CH edit
-						return 0
+				//CHOMPEdit Begin
 
 				if(step_is_valid == SURGERY_FAILURE) // This is a failure that already has a message for failing.
 					return 1
 				M.op_stage.in_progress += zone
 				S.begin_step(user, M, zone, src)		//start on it
 				var/success = TRUE
-
+				if(M == user)	// Once we determine if we can actually do a step at all, give a slight delay to self-surgery to confirm attempts.
+					to_chat(user, "<span class='danger'>You focus on attempting to perform surgery upon yourself.</span>")	//CHOMPEdit
+					if(!do_after(user, 6 SECONDS, M) || !prob(70)) // CH edit
+						to_chat(user, "<span class='danger'>You fail to focus on your task, causing your hand to slip!</span>") // CH edit
+						success = FALSE
+				//CHOMPEdit End
 				// Bad tools make it less likely to succeed.
 				if(!prob(S.tool_quality(src)))
 					success = FALSE
