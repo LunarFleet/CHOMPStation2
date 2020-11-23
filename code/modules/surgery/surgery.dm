@@ -128,7 +128,7 @@
 
 	return 1
 
-/obj/item/proc/do_surgery(mob/living/carbon/M, mob/living/user, target_zone)
+/obj/item/proc/do_surgery(mob/living/carbon/M, mob/living/user)
 	if(!can_do_surgery(M, user))
 		return 0
 	if(!istype(M))
@@ -151,7 +151,7 @@
 
 					if(!do_after(user, 6 SECONDS, M) || !prob(70)) // CH edit
 						to_chat(user, "<span class='critical'>You fail to focus on your task, causing your hand to slip!</span>") // CH edit
-						var/obj/item/organ/external/affected = user.get_organ(target_zone) // CH edit
+						var/obj/item/organ/external/affected = user.get_organ(zone) // CH edit
 						affected.createwound(CUT, rand(10,20)) // CH edit
 						return 0
 
